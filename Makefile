@@ -8,8 +8,11 @@ clean-all:
 	docker system prune -f
 
 shell:
-	docker run -it polyglot:latest
-	docker exec -it polyglot:latest /bin/bash
+	docker run -it jpwhite3/polyglot:latest
+	docker exec -it jpwhite3/polyglot:latest /bin/bash
 
 build:
-	docker build . -t polyglot:latest --platform linux/amd64 --progress=plain
+	docker build . -t jpwhite3/polyglot:latest --platform linux/amd64 --progress=plain
+
+publish:
+	docker push jpwhite3/polyglot:latest
