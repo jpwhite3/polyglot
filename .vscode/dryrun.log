@@ -1,0 +1,5 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/jpwhite/Code/polyglot'
+docker build . -t jpwhite3/polyglot:latest --platform linux/amd64 --progress=plain
+make: Leaving directory `/Users/jpwhite/Code/polyglot'
+ 
