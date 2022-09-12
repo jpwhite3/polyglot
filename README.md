@@ -25,7 +25,7 @@ This image is based on Ubuntu 22.04
 - Dotnet == 6.0.300
 - Python == 3.10.4
 - Poetry == 1.1.13
-- GO == 1.18
+- GO == 1.19
 
 # Build Instructions
 

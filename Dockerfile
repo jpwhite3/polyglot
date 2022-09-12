@@ -69,8 +69,8 @@ RUN \
 
 # GO Installation
 RUN \
-	curl -OL https://go.dev/dl/go1.18.linux-amd64.tar.gz \
-	&& tar -C /usr/local -xvf go1.18.linux-amd64.tar.gz \
+	curl -OL https://go.dev/dl/go1.19.linux-amd64.tar.gz \
+	&& tar -C /usr/local -xvf go1.19.linux-amd64.tar.gz \
 	&& ln -s /usr/local/go/bin/go /usr/bin/go
 
 # NODE Installation with nvm 
