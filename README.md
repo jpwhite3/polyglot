@@ -22,7 +22,7 @@ This image is based on Ubuntu 22.04
 - nvm == 0.39.1
 - Java == "18-ea" 2022-03-22
 - gradle == 7.4.2
-- Dotnet == 6.0.300
+- Dotnet == 6.0.109
 - Python == 3.10.4
 - Poetry == 1.1.13
 - GO == 1.19

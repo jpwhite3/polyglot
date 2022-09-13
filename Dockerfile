@@ -30,10 +30,7 @@ RUN apt update \
 	&& rm -rf \
 	/tmp/* \
 	/var/lib/apt/lists/* \
-	/var/tmp/* \
-	&& wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb --no-check-certificate \
-	&& dpkg -i packages-microsoft-prod.deb \
-	&& rm -f packages-microsoft-prod.deb
+	/var/tmp/*
 
 ENV TZ='America/New_York'
 RUN apt-get update --no-install-recommends \
@@ -43,7 +40,7 @@ RUN apt-get update --no-install-recommends \
 	# JAVA LATEST
 	openjdk-18-jdk-headless maven \
 	# .NET-CORE LATEST
-	dotnet-sdk-6.0 \
+	dotnet6 \
 	# CLEAN UP
 	&& apt-get purge --auto-remove -y \
 	&& apt-get clean \
@@ -54,13 +51,14 @@ RUN apt-get update --no-install-recommends \
 
 # Gradle Installation
 RUN \
-	wget https://services.gradle.org/distributions/gradle-7.4.2-bin.zip -P /tmp \
+	wget -nv https://services.gradle.org/distributions/gradle-7.4.2-bin.zip -P /tmp \
 	&& mkdir /opt/gradle \
 	&& unzip -d /opt/gradle /tmp/gradle-7.4.2-bin.zip \
 	&& echo "export GRADLE_HOME=/opt/gradle/gradle-7.4.2" >> /etc/profile.d/gradle.sh \
 	&& echo "export PATH=${GRADLE_HOME}/bin:${PATH}" >> /etc/profile.d/gradle.sh \
 	&& chmod +x /etc/profile.d/gradle.sh \
-	&& rm -f /tmp/gradle-7.4.2-bin.zip
+	&& rm -f /tmp/gradle-7.4.2-bin.zip \
+	&& ln -s /opt/gradle/gradle-7.4.2/bin/gradle /usr/bin/gradle
 
 # PYTHON Configuration
 RUN \
@@ -80,13 +78,18 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | b
 	&& nvm install $NODE_VERSION \
 	&& nvm alias default $NODE_VERSION \
 	&& nvm use default \
-	&& ln -s $(which node) /usr/bin/node
+	&& ln -s $(which node) /usr/bin/node \
+	&& ln -s $(which npm) /usr/bin/npm
 
 # Print versions
 RUN \
 	echo "Tool versions:" \
 	&& python --version \
+	&& pip --version \
 	&& java -version \
+	&& mvn --version \
+	&& gradle --version \
 	&& go version \
-	&& dotnet --list-sdks \
-	&& node --version
+	&& dotnet --version \
+	&& node --version \
+	&& npm --version
