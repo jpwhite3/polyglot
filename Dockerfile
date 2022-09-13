@@ -50,7 +50,9 @@ RUN apt-get update --no-install-recommends \
 	&& rm -rf \
 	/tmp/* \
 	/var/lib/apt/lists/* \
-	/var/tmp/*
+	/var/tmp/* \
+	# Create global.json for dotnet
+	&& dotnet new globaljson --sdk-version 6.0.104
 
 # Gradle Installation
 RUN \
