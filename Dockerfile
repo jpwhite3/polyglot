@@ -1,4 +1,6 @@
 FROM ubuntu:22.04
+
+ENV TZ='America/New_York'
 RUN apt update \
 	&& apt upgrade -y \
 	&& apt install software-properties-common -y \
@@ -24,6 +26,12 @@ RUN apt update \
 	dirmngr \
 	gpg gpg-agent \
 	ca-certificates \
+	# PYTHON LATEST
+	python3 python3-dev python3-venv python3-pip \
+	# JAVA LATEST
+	openjdk-18-jdk-headless maven \
+	# .NET-CORE LATEST
+	dotnet6 \	
 	# CLEAN UP
 	&& apt-get purge --auto-remove -y \
 	&& apt-get clean \
@@ -32,22 +40,11 @@ RUN apt update \
 	/var/lib/apt/lists/* \
 	/var/tmp/*
 
-ENV TZ='America/New_York'
-RUN apt-get update --no-install-recommends \
-	&& DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
-	# PYTHON LATEST
-	python3 python3-dev python3-venv python3-pip \
-	# JAVA LATEST
-	openjdk-18-jdk-headless maven \
-	# .NET-CORE LATEST
-	dotnet6 \
-	# CLEAN UP
-	&& apt-get purge --auto-remove -y \
-	&& apt-get clean \
-	&& rm -rf \
-	/tmp/* \
-	/var/lib/apt/lists/* \
-	/var/tmp/*
+# Git Configuration
+RUN \
+	git config --global pull.rebase true \
+	&& git config --global fetch.prune true \
+	&& git config --global diff.colorMoved zebra
 
 # Gradle Installation
 RUN \
@@ -60,18 +57,18 @@ RUN \
 	&& rm -f /tmp/gradle-7.4.2-bin.zip \
 	&& ln -s /opt/gradle/gradle-7.4.2/bin/gradle /usr/bin/gradle
 
-# PYTHON Configuration
+# Python configuration
 RUN \
 	ln -s /usr/bin/python3 /usr/bin/python \
-	&& python -m pip install --upgrade pip setuptools wheel poetry
+	&& python -m pip install --upgrade pip setuptools wheel poetry pipenv
 
-# GO Installation
+# GO installation
 RUN \
 	curl -OL https://go.dev/dl/go1.19.linux-amd64.tar.gz \
 	&& tar -C /usr/local -xvf go1.19.linux-amd64.tar.gz \
 	&& ln -s /usr/local/go/bin/go /usr/bin/go
 
-# NODE Installation with nvm 
+# Node installation with nvm 
 ENV NODE_VERSION lts/gallium
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash \
 	&& . ~/.nvm/nvm.sh \
