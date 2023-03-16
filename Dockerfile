@@ -43,6 +43,7 @@ RUN apt update \
 # Git Configuration
 RUN \
 	git config --global pull.rebase true \
+	&& git config --global init.defaultbranch main \
 	&& git config --global fetch.prune true \
 	&& git config --global diff.colorMoved zebra
 
