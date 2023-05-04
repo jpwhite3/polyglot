@@ -1,4 +1,4 @@
-FROM ubuntu:22.10
+FROM ubuntu:kinetic
 
 ENV TZ='America/New_York'
 RUN apt update \
