@@ -49,14 +49,14 @@ RUN \
 
 # Gradle Installation
 RUN \
-	wget -nv https://services.gradle.org/distributions/gradle-7.4.2-bin.zip -P /tmp \
+	wget -nv https://services.gradle.org/distributions/gradle-7.6.1-bin.zip -P /tmp \
 	&& mkdir /opt/gradle \
-	&& unzip -d /opt/gradle /tmp/gradle-7.4.2-bin.zip \
-	&& echo "export GRADLE_HOME=/opt/gradle/gradle-7.4.2" >> /etc/profile.d/gradle.sh \
+	&& unzip -d /opt/gradle /tmp/gradle-7.6.1-bin.zip \
+	&& echo "export GRADLE_HOME=/opt/gradle/gradle-7.6.1" >> /etc/profile.d/gradle.sh \
 	&& echo "export PATH=${GRADLE_HOME}/bin:${PATH}" >> /etc/profile.d/gradle.sh \
 	&& chmod +x /etc/profile.d/gradle.sh \
-	&& rm -f /tmp/gradle-7.4.2-bin.zip \
-	&& ln -s /opt/gradle/gradle-7.4.2/bin/gradle /usr/bin/gradle
+	&& rm -f /tmp/gradle-7.6.1-bin.zip \
+	&& ln -s /opt/gradle/gradle-7.6.1/bin/gradle /usr/bin/gradle
 
 # Python configuration
 RUN \
@@ -65,8 +65,8 @@ RUN \
 
 # GO installation
 RUN \
-	curl -OL https://go.dev/dl/go1.19.4.linux-amd64.tar.gz \
-	&& tar -C /usr/local -xvf go1.19.4.linux-amd64.tar.gz \
+	curl -OL https://go.dev/dl/go1.20.5.linux-amd64.tar.gz \
+	&& tar -C /usr/local -xvf go1.20.5.linux-amd64.tar.gz \
 	&& ln -s /usr/local/go/bin/go /usr/bin/go
 
 # Node installation with nvm 
