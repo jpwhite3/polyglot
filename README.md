@@ -14,18 +14,20 @@ _NOTE:_ This image is on the large side, around 2.5GB in total. This makes it to
 
 ## Base Image
 
-This image is based on Ubuntu 22.04
+This image is based on Ubuntu 23.10 (mantic)
 
 ## Included Languages & Tools
 
-- Node == v18.12.1
-- nvm == 0.39.1
-- Java == "18.0.2-ea" 2022-07-19
-- gradle == 7.4.2
-- Dotnet == 6.0.111
-- Python == 3.10.6
+- Node == 18.18.0
+- nvm == 0.39.5
+- npm == 9.8.1
+- Java == 20.0.2
+- Gradle == 8.3
+- Maven == 3.8.7
+- Dotnet == 6.0.122
+- Python == 3.11.5
 - Poetry == 1.1.13
-- GO == 1.19.4
+- GO == 1.21.1
 
 # Build Instructions
 

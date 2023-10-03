@@ -1,10 +1,10 @@
-FROM ubuntu:kinetic
+FROM ubuntu:mantic
 
 ENV TZ='America/New_York'
 RUN apt update \
 	&& apt upgrade -y \
 	&& apt install software-properties-common -y \
-	&& add-apt-repository ppa:deadsnakes/ppa \
+	#&& add-apt-repository ppa:deadsnakes/ppa \
 	&& DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
 	curl \
 	wget \
@@ -29,7 +29,7 @@ RUN apt update \
 	# PYTHON LATEST
 	python3 python3-dev python3-venv python3-pip \
 	# JAVA LATEST
-	openjdk-18-jdk-headless maven \
+	openjdk-20-jdk-headless maven \
 	# .NET-CORE LATEST
 	dotnet6 \	
 	# CLEAN UP
@@ -49,29 +49,29 @@ RUN \
 
 # Gradle Installation
 RUN \
-	wget -nv https://services.gradle.org/distributions/gradle-7.6.1-bin.zip -P /tmp \
+	wget -nv https://services.gradle.org/distributions/gradle-8.3-bin.zip -P /tmp \
 	&& mkdir /opt/gradle \
-	&& unzip -d /opt/gradle /tmp/gradle-7.6.1-bin.zip \
-	&& echo "export GRADLE_HOME=/opt/gradle/gradle-7.6.1" >> /etc/profile.d/gradle.sh \
+	&& unzip -d /opt/gradle /tmp/gradle-8.3-bin.zip \
+	&& echo "export GRADLE_HOME=/opt/gradle/gradle-8.3" >> /etc/profile.d/gradle.sh \
 	&& echo "export PATH=${GRADLE_HOME}/bin:${PATH}" >> /etc/profile.d/gradle.sh \
 	&& chmod +x /etc/profile.d/gradle.sh \
-	&& rm -f /tmp/gradle-7.6.1-bin.zip \
-	&& ln -s /opt/gradle/gradle-7.6.1/bin/gradle /usr/bin/gradle
+	&& rm -f /tmp/gradle-8.3-bin.zip \
+	&& ln -s /opt/gradle/gradle-8.3/bin/gradle /usr/bin/gradle
 
 # Python configuration
 RUN \
 	ln -s /usr/bin/python3 /usr/bin/python \
-	&& python -m pip install --upgrade pip setuptools wheel poetry pipenv
+	&& python -m pip install --upgrade pip setuptools wheel poetry pipenv --break-system-packages
 
 # GO installation
 RUN \
-	curl -OL https://go.dev/dl/go1.20.5.linux-amd64.tar.gz \
-	&& tar -C /usr/local -xvf go1.20.5.linux-amd64.tar.gz \
+	curl -OL https://go.dev/dl/go1.21.1.linux-amd64.tar.gz \
+	&& tar -C /usr/local -xvf go1.21.1.linux-amd64.tar.gz \
 	&& ln -s /usr/local/go/bin/go /usr/bin/go
 
 # Node installation with nvm 
 ENV NODE_VERSION lts/hydrogen
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash \
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash \
 	&& . ~/.nvm/nvm.sh \
 	&& nvm install $NODE_VERSION \
 	&& nvm alias default $NODE_VERSION \
@@ -84,6 +84,7 @@ RUN \
 	echo "Tool versions:" \
 	&& python --version \
 	&& pip --version \
+	&& poetry --version \
 	&& java -version \
 	&& mvn --version \
 	&& gradle --version \
