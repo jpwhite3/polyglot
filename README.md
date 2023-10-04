@@ -22,8 +22,6 @@ This image is based on Ubuntu 23.10 (mantic)
 - nvm == 0.39.5
 - npm == 9.8.1
 - Java == 20.0.2
-- Gradle == 8.3
-- Maven == 3.8.7
 - Dotnet == 6.0.122
 - Python == 3.11.5
 - Poetry == 1.1.13

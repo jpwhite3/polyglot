@@ -29,7 +29,7 @@ RUN apt update \
 	# PYTHON LATEST
 	python3 python3-dev python3-venv python3-pip \
 	# JAVA LATEST
-	openjdk-20-jdk-headless maven \
+	openjdk-20-jdk-headless \
 	# .NET-CORE LATEST
 	dotnet6 \	
 	# CLEAN UP
@@ -46,17 +46,6 @@ RUN \
 	&& git config --global init.defaultbranch main \
 	&& git config --global fetch.prune true \
 	&& git config --global diff.colorMoved zebra
-
-# Gradle Installation
-RUN \
-	wget -nv https://services.gradle.org/distributions/gradle-8.3-bin.zip -P /tmp \
-	&& mkdir /opt/gradle \
-	&& unzip -d /opt/gradle /tmp/gradle-8.3-bin.zip \
-	&& echo "export GRADLE_HOME=/opt/gradle/gradle-8.3" >> /etc/profile.d/gradle.sh \
-	&& echo "export PATH=${GRADLE_HOME}/bin:${PATH}" >> /etc/profile.d/gradle.sh \
-	&& chmod +x /etc/profile.d/gradle.sh \
-	&& rm -f /tmp/gradle-8.3-bin.zip \
-	&& ln -s /opt/gradle/gradle-8.3/bin/gradle /usr/bin/gradle
 
 # Python configuration
 RUN \
@@ -86,8 +75,6 @@ RUN \
 	&& pip --version \
 	&& poetry --version \
 	&& java -version \
-	&& mvn --version \
-	&& gradle --version \
 	&& go version \
 	&& dotnet --version \
 	&& node --version \
