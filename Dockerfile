@@ -1,10 +1,11 @@
 FROM ubuntu:mantic
 
+SHELL ["/bin/bash", "-c"]
+
 ENV TZ='America/New_York'
 RUN apt update \
 	&& apt upgrade -y \
 	&& apt install software-properties-common -y \
-	#&& add-apt-repository ppa:deadsnakes/ppa \
 	&& DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
 	curl \
 	wget \
@@ -26,6 +27,7 @@ RUN apt update \
 	dirmngr \
 	gpg gpg-agent \
 	ca-certificates \
+	zsh \
 	# PYTHON LATEST
 	python3 python3-dev python3-venv python3-pip \
 	# JAVA LATEST
@@ -39,6 +41,9 @@ RUN apt update \
 	/tmp/* \
 	/var/lib/apt/lists/* \
 	/var/tmp/*
+
+# Zshell Configuration
+RUN chsh -s $(which zsh)
 
 # Git Configuration
 RUN \
@@ -54,12 +59,12 @@ RUN \
 
 # GO installation
 RUN \
-	curl -OL https://go.dev/dl/go1.21.1.linux-amd64.tar.gz \
-	&& tar -C /usr/local -xvf go1.21.1.linux-amd64.tar.gz \
+	curl -OL https://go.dev/dl/go1.21.3.linux-amd64.tar.gz \
+	&& tar -C /usr/local -xvf go1.21.3.linux-amd64.tar.gz \
 	&& ln -s /usr/local/go/bin/go /usr/bin/go
 
 # Node installation with nvm 
-ENV NODE_VERSION lts/hydrogen
+ENV NODE_VERSION lts/iron
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash \
 	&& . ~/.nvm/nvm.sh \
 	&& nvm install $NODE_VERSION \
@@ -67,6 +72,10 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | b
 	&& nvm use default \
 	&& ln -s $(which node) /usr/bin/node \
 	&& ln -s $(which npm) /usr/bin/npm
+
+# Rust installation
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Print versions
 RUN \
@@ -78,4 +87,7 @@ RUN \
 	&& go version \
 	&& dotnet --version \
 	&& node --version \
-	&& npm --version
+	&& npm --version \
+	&& rustup --version \
+	&& rustc --version
+
