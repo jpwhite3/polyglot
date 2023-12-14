@@ -33,7 +33,9 @@ RUN apt update \
 	# JAVA LATEST
 	openjdk-20-jdk-headless \
 	# .NET-CORE LATEST
-	dotnet6 \	
+	dotnet6 \
+	# Ruby LATEST
+	ruby-full rbenv \
 	# CLEAN UP
 	&& apt-get purge --auto-remove -y \
 	&& apt-get clean \
@@ -44,6 +46,9 @@ RUN apt update \
 
 # Zshell Configuration
 RUN chsh -s $(which zsh)
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+COPY polyglot.zsh-theme /root/.oh-my-zsh/themes/polyglot.zsh-theme
+RUN sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="polyglot"/' /root/.zshrc
 
 # Git Configuration
 RUN \
@@ -59,8 +64,8 @@ RUN \
 
 # GO installation
 RUN \
-	curl -OL https://go.dev/dl/go1.21.3.linux-amd64.tar.gz \
-	&& tar -C /usr/local -xvf go1.21.3.linux-amd64.tar.gz \
+	curl -OL https://go.dev/dl/go1.21.5.linux-amd64.tar.gz \
+	&& tar -C /usr/local -xvf go1.21.5.linux-amd64.tar.gz \
 	&& ln -s /usr/local/go/bin/go /usr/bin/go
 
 # Node installation with nvm 
@@ -77,17 +82,25 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | b
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 
+# Docker installation
+RUN curl -fsSL https://get.docker.com | sh
+
 # Print versions
 RUN \
 	echo "Tool versions:" \
 	&& python --version \
 	&& pip --version \
 	&& poetry --version \
+	&& pipenv --version \
 	&& java -version \
 	&& go version \
 	&& dotnet --version \
 	&& node --version \
 	&& npm --version \
 	&& rustup --version \
-	&& rustc --version
+	&& rustc --version \
+	&& ruby --version \
+	&& gem --version \
+	&& rbenv --version \
+	&& docker --version
 
