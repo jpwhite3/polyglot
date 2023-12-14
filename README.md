@@ -7,7 +7,7 @@ Multi programming language container image built for interactive development env
 - [Coder](https://coder.com)
 - [GitHub Codespaces](https://github.com/features/codespaces)
 - [JupyterLab](https://jupyter.org)
-- CICD Systems
+- [GitLab](https://about.gitlab.com)
 - etc.
 
 _NOTE:_ This image is on the large side, around 2.5GB in total. This makes it too big for most large scale uses. But in small scale it seems to work quite well despite its size.
@@ -18,14 +18,16 @@ This image is based on Ubuntu 23.10 (mantic)
 
 ## Included Languages & Tools
 
-- Node == 18.18.0
-- nvm == 0.39.5
-- npm == 9.8.1
-- Java == 20.0.2
-- Dotnet == 6.0.122
-- Python == 3.11.5
-- Poetry == 1.1.13
-- GO == 1.21.1
+| Language Ecosystem | Version  | Included Tools |
+| ------------------ | -------- | -------------- |
+| Node               | 20.10.0  | nvm, npm       |
+| Python             | 3.11.5   | Poetry, pipenv |
+| Ruby               | 3.1.2p20 | gem, rbenv     |
+| Java               | 20.0.2   |                |
+| Dotnet             | 6.0.122  |                |
+| GO                 | 1.21.5   |                |
+| Rust               | 1.74.1   |                |
+| Docker             | 24.0.7   |                |
 
 # Build Instructions
 
