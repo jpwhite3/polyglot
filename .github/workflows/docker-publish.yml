@@ -2,7 +2,7 @@ name: Docker
 
 on:
   push:
-    branches: [ develop, main ]
+    branches: [develop, main]
     tags:
       - v*
   pull_request:
@@ -15,7 +15,7 @@ jobs:
     if: github.ref_name == 'develop'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Run tests
         run: |
           make build
@@ -24,7 +24,7 @@ jobs:
     if: github.ref_name == 'main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Build image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME
