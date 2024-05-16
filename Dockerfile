@@ -64,13 +64,13 @@ RUN \
 
 # GO installation
 RUN \
-	curl -OL https://go.dev/dl/go1.21.5.linux-amd64.tar.gz \
-	&& tar -C /usr/local -xvf go1.21.5.linux-amd64.tar.gz \
+	curl -OL https://go.dev/dl/go1.22.3.linux-amd64.tar.gz \
+	&& tar -C /usr/local -xvf go1.22.3.linux-amd64.tar.gz \
 	&& ln -s /usr/local/go/bin/go /usr/bin/go
 
 # Node installation with nvm 
 ENV NODE_VERSION lts/iron
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash \
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash \
 	&& . ~/.nvm/nvm.sh \
 	&& nvm install $NODE_VERSION \
 	&& nvm alias default $NODE_VERSION \
