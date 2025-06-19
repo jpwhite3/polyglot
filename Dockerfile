@@ -1,4 +1,4 @@
-FROM ubuntu:mantic
+FROM ubuntu:latest
 
 SHELL ["/bin/bash", "-c"]
 
