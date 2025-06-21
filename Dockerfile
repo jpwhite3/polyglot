@@ -1,106 +1,125 @@
-FROM ubuntu:latest
+# Stage 1: Base system with common dependencies
+FROM ubuntu:24.04 AS base
 
 SHELL ["/bin/bash", "-c"]
+ENV TZ='America/New_York' \
+	DEBIAN_FRONTEND="noninteractive" \
+	PATH="/root/.cargo/bin:/root/.nvm/versions/node/v22.16.0/bin:/usr/local/go/bin:${PATH}" \
+	NVM_DIR="/root/.nvm" \
+	NODE_VERSION="lts/jod"
 
-ENV TZ='America/New_York'
-RUN apt update \
-	&& apt upgrade -y \
-	&& apt install software-properties-common -y \
-	&& DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
-	curl \
-	wget \
-	sudo \
-	apt-utils \
+# Install common packages in a single layer with proper cleanup
+RUN apt-get update && \
+	apt-get upgrade -y && \
+	apt-get install -y --no-install-recommends \
 	apt-transport-https \
+	apt-utils \
+	ca-certificates \
+	curl \
 	g++ \
 	gcc \
 	git \
-	make \
-	p7zip-full \
-	unzip \
-	xz-utils \
+	gpg \
+	gpg-agent \
 	jq \
-	vim \
-	tree \
 	less \
-	libc6-dev \
-	dirmngr \
-	gpg gpg-agent \
-	ca-certificates \
-	zsh \
-	# PYTHON LATEST
-	python3 python3-dev python3-venv python3-pip \
-	# JAVA LATEST
-	openjdk-21-jdk \
-	# .NET-CORE LATEST
-	dotnet-sdk-8.0 dotnet-runtime-8.0 \
-	# Ruby LATEST
-	ruby-full rbenv \
-	# CLEAN UP
-	&& apt-get purge --auto-remove -y \
-	&& apt-get clean \
-	&& rm -rf \
-	/tmp/* \
-	/var/lib/apt/lists/* \
-	/var/tmp/*
+	# libc6-dev \
+	make \
+	software-properties-common \
+	sudo \
+	tree \
+	unzip \
+	zip \
+	vim \
+	wget \
+	# xz-utils \
+	zsh && \
+	# Clean up in the same layer to reduce image size
+	apt-get clean && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Stage 2: Language-specific installations
+FROM base AS languages
+
+# Add repositories and install programming languages in a single layer
+RUN apt-get update && \
+	# Python
+	apt-get install -y --no-install-recommends python3 python3-dev python3-venv python3-pip && \
+	ln -s /usr/bin/python3 /usr/bin/python && \
+	# Java
+	apt-get install -y --no-install-recommends openjdk-21-jdk && \
+	# .NET
+	apt-get install -y --no-install-recommends dotnet-sdk-8.0 dotnet-runtime-8.0 && \
+	# Ruby
+	apt-get install -y --no-install-recommends ruby-full rbenv && \
+	# Clean up
+	apt-get clean && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Stage 3: Tool installations (Go, Node, Rust, Docker)
+FROM languages AS tools
+
+# Install Go
+RUN curl -OL https://go.dev/dl/go1.24.4.linux-amd64.tar.gz && \
+	tar -C /usr/local -xf go1.24.4.linux-amd64.tar.gz && \
+	rm go1.24.4.linux-amd64.tar.gz && \
+	ln -sf /usr/local/go/bin/go /usr/bin/go
+
+# Install Node.js with nvm
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash && \
+	. $NVM_DIR/nvm.sh && \
+	nvm install $NODE_VERSION && \
+	nvm alias default $NODE_VERSION && \
+	nvm use default && \
+	ln -sf $(. $NVM_DIR/nvm.sh && which node) /usr/bin/node && \
+	ln -sf $(. $NVM_DIR/nvm.sh && which npm) /usr/bin/npm
+
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
+
+# Install Docker
+RUN curl -fsSL https://get.docker.com | sh
+
+# Stage 4: Python packages and configuration
+FROM tools AS python-config
+
+RUN python -m pip install --no-cache-dir pipx poetry pipenv --break-system-packages
+
+# Stage 5: Final image with configurations
+FROM python-config AS final
+
+# Git Configuration
+RUN git config --global pull.rebase true && \
+	git config --global init.defaultbranch main && \
+	git config --global fetch.prune true && \
+	git config --global diff.colorMoved zebra
 
 # Zshell Configuration
-RUN chsh -s $(which zsh)
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended && \
+	chsh -s $(which zsh)
+
+# Copy theme file
 COPY polyglot.zsh-theme /root/.oh-my-zsh/themes/polyglot.zsh-theme
 RUN sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="polyglot"/' /root/.zshrc
 
-# Git Configuration
-RUN \
-	git config --global pull.rebase true \
-	&& git config --global init.defaultbranch main \
-	&& git config --global fetch.prune true \
-	&& git config --global diff.colorMoved zebra
+# Print versions for verification
+RUN echo "Tool versions:" && \
+	python --version && \
+	pip --version && \
+	poetry --version && \
+	pipenv --version && \
+	java -version && \
+	go version && \
+	dotnet --version && \
+	. $NVM_DIR/nvm.sh && \
+	node --version && \
+	npm --version && \
+	rustup --version && \
+	rustc --version && \
+	ruby --version && \
+	gem --version && \
+	rbenv --version && \
+	docker --version
 
-# Python configuration
-RUN \
-	ln -s /usr/bin/python3 /usr/bin/python \
-	&& python -m pip install pipx poetry pipenv --break-system-packages
-
-# GO installation
-RUN \
-	curl -OL https://go.dev/dl/go1.24.4.linux-amd64.tar.gz \
-	&& tar -C /usr/local -xvf go1.24.4.linux-amd64.tar.gz \
-	&& ln -s /usr/local/go/bin/go /usr/bin/go
-
-# Node installation with nvm 
-ENV NODE_VERSION lts/iron
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash \
-	&& . ~/.nvm/nvm.sh \
-	&& nvm install $NODE_VERSION \
-	&& nvm alias default $NODE_VERSION \
-	&& nvm use default \
-	&& ln -s $(which node) /usr/bin/node \
-	&& ln -s $(which npm) /usr/bin/npm
-
-# Rust installation
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
-
-# Docker installation
-RUN curl -fsSL https://get.docker.com | sh
-
-# Print versions
-RUN \
-	echo "Tool versions:" \
-	&& python --version \
-	&& pip --version \
-	&& poetry --version \
-	&& pipenv --version \
-	&& java -version \
-	&& go version \
-	&& dotnet --version \
-	&& node --version \
-	&& npm --version \
-	&& rustup --version \
-	&& rustc --version \
-	&& ruby --version \
-	&& gem --version \
-	&& rbenv --version \
-	&& docker --version
-
+# Set default shell to zsh
+CMD ["zsh"]

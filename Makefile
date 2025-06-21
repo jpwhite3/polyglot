@@ -14,5 +14,8 @@ shell:
 build:
 	docker build . -t jpwhite3/polyglot:latest --platform linux/amd64 --progress=plain
 
+scan:
+	docker scout quickview
+
 publish:
 	docker push jpwhite3/polyglot:latest
