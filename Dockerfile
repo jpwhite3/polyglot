@@ -1,6 +1,7 @@
 # Stage 1: Base system with common dependencies
 FROM ubuntu:24.04 AS base
 
+
 SHELL ["/bin/bash", "-c"]
 ENV TZ='America/New_York' \
 	DEBIAN_FRONTEND="noninteractive" \
