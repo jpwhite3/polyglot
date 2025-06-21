@@ -10,24 +10,24 @@ Multi programming language container image built for interactive development env
 - [GitLab](https://about.gitlab.com)
 - etc.
 
-_NOTE:_ This image is on the large side, around 2.5GB in total. This makes it too big for most large scale uses. But in small scale it seems to work quite well despite its size.
+_NOTE:_ This image is **large**, around 5GB in total. This makes it far too big for most large scale uses. But in small scale it seems to work quite well despite its size.
 
 ## Base Image
 
-This image is based on Ubuntu 23.10 (mantic)
+This image is based on Ubuntu (latest LTS)
 
 ## Included Languages & Tools
 
-| Language Ecosystem | Version  | Included Tools |
-| ------------------ | -------- | -------------- |
-| Node               | 20.10.0  | nvm, npm       |
-| Python             | 3.11.5   | Poetry, pipenv |
-| Ruby               | 3.1.2p20 | gem, rbenv     |
-| Java               | 20.0.2   |                |
-| Dotnet             | 6.0.122  |                |
-| GO                 | 1.21.5   |                |
-| Rust               | 1.74.1   |                |
-| Docker             | 24.0.7   |                |
+| Language Ecosystem | Version |
+| ------------------ | ------- |
+| Node               | 22.16.0 |
+| Python             | 3.12.3  |
+| Java               | 21.0.7  |
+| Dotnet             | 8.0.117 |
+| GO                 | 1.24.4  |
+| Ruby               | 3.2.3   |
+| Rust               | 1.87.0  |
+| Docker             | 28.2.2  |
 
 # Build Instructions
 
