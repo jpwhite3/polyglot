@@ -18,16 +18,16 @@ This image is based on Ubuntu (latest LTS)
 
 ## Included Languages & Tools
 
-| Language Ecosystem | Version | Included Tools       |
-| ------------------ | ------- | -------------------- |
-| Node               | 22.16.0 | nvm, npm             |
-| Python             | 3.11.5  | poetry, pipenv, pipx |
-| Java               | 21.0.7  |                      |
-| Dotnet             | 8.0.117 |                      |
-| GO                 | 1.24.4  |                      |
-| Ruby               | 3.2.3   | rbenv, gem           |
-| Rust               | 1.87.0  |                      |
-| Docker             | 28.2.2  |                      |
+| Language Ecosystem | Version |
+| ------------------ | ------- |
+| Node               | 22.16.0 |
+| Python             | 3.12.3  |
+| Java               | 21.0.7  |
+| Dotnet             | 8.0.117 |
+| GO                 | 1.24.4  |
+| Ruby               | 3.2.3   |
+| Rust               | 1.87.0  |
+| Docker             | 28.2.2  |
 
 # Build Instructions
 
