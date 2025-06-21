@@ -31,9 +31,9 @@ RUN apt update \
 	# PYTHON LATEST
 	python3 python3-dev python3-venv python3-pip \
 	# JAVA LATEST
-	openjdk-20-jdk-headless \
+	openjdk-21-jdk \
 	# .NET-CORE LATEST
-	dotnet6 \
+	dotnet-sdk-8.0 dotnet-runtime-8.0 \
 	# Ruby LATEST
 	ruby-full rbenv \
 	# CLEAN UP
@@ -60,7 +60,7 @@ RUN \
 # Python configuration
 RUN \
 	ln -s /usr/bin/python3 /usr/bin/python \
-	&& python -m pip install --upgrade pip setuptools wheel poetry pipenv --break-system-packages
+	&& python -m pip install pipx poetry pipenv --break-system-packages
 
 # GO installation
 RUN \
