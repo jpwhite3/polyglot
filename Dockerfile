@@ -48,7 +48,7 @@ RUN apt-get update && \
 	apt-get install -y --no-install-recommends python3 python3-dev python3-venv python3-pip && \
 	ln -s /usr/bin/python3 /usr/bin/python && \
 	# Java
-	apt-get install -y --no-install-recommends openjdk-21-jdk && \
+	apt-get install -y --no-install-recommends openjdk-25-jdk && \
 	# .NET
 	apt-get install -y --no-install-recommends dotnet-sdk-8.0 dotnet-runtime-8.0 && \
 	# Ruby
@@ -61,9 +61,9 @@ RUN apt-get update && \
 FROM languages AS tools
 
 # Install Go
-RUN curl -OL https://go.dev/dl/go1.24.4.linux-amd64.tar.gz && \
-	tar -C /usr/local -xf go1.24.4.linux-amd64.tar.gz && \
-	rm go1.24.4.linux-amd64.tar.gz && \
+RUN curl -OL https://go.dev/dl/go1.25.6.linux-amd64.tar.gz && \
+	tar -C /usr/local -xf go1.25.6.linux-amd64.tar.gz && \
+	rm go1.25.6.linux-amd64.tar.gz && \
 	ln -sf /usr/local/go/bin/go /usr/bin/go
 
 # Install Node.js with nvm
