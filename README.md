@@ -10,7 +10,16 @@ Multi programming language container image built for interactive development env
 - [GitLab](https://about.gitlab.com)
 - etc.
 
-_NOTE:_ This image is **large**, around 5GB in total. This makes it far too big for most large scale uses. But in small scale it seems to work quite well despite its size.
+_NOTE:_ This image is **large**, around 3.5GB in total. This makes it far too big for most large scale uses. But in small scale it seems to work quite well despite its size.
+
+The `Dockerfile` is built with several size and speed optimizations:
+
+- **BuildKit cache mounts** on `/var/cache/apt`, `/var/lib/apt`, and `/root/.cache/pip` so repeated builds skip re-downloading packages and pip wheels (cached rebuilds with no Dockerfile changes take ~1–2 seconds).
+- **Rust** is installed with `--profile minimal` and only `clippy` + `rustfmt` are added back, dropping the ~700MB `rust-docs` component.
+- **Docker** is the CLI + `buildx` + `compose` plugins from Docker's official apt repo only — the daemon and `containerd` are intentionally omitted (~600MB savings); typical use is to mount the host's docker socket into the container.
+- **Java** uses the highest `openjdk-N-jdk-headless` available (no Swing/AWT, ~200MB savings).
+- **.NET** installs the SDK only — the SDK already ships with the matching runtime, so the runtime package is redundant.
+- **Go's** bundled `doc/`, `test/`, and `api/` directories are stripped after install (~100MB savings).
 
 ## Base Image
 
@@ -33,12 +42,12 @@ How "latest" is determined for each tool:
 | Go                         | Queries `https://go.dev/VERSION?m=text` for the current stable    |
 | nvm                        | Queries the GitHub releases API for `nvm-sh/nvm`                  |
 | Node.js                    | `nvm install --lts` (current LTS line)                            |
-| Java                       | Highest `openjdk-N-jdk` available in the Ubuntu apt repos         |
-| .NET                       | Highest `dotnet-sdk-X.Y` available in the Ubuntu apt repos        |
+| Java                       | Highest `openjdk-N-jdk-headless` available in the Ubuntu apt repos |
+| .NET                       | Highest `dotnet-sdk-X.Y` available in the Ubuntu apt repos (SDK only; bundles its own runtime) |
 | Python                     | `python3` from the Ubuntu apt repos                               |
 | Ruby                       | `ruby-full` from the Ubuntu apt repos                             |
-| Rust                       | `rustup` installs the latest stable toolchain                     |
-| Docker                     | Docker's official `get.docker.com` install script                 |
+| Rust                       | `rustup` (`--profile minimal` + `clippy` + `rustfmt`)             |
+| Docker                     | `docker-ce-cli`, `docker-buildx-plugin`, `docker-compose-plugin` from Docker's official apt repo |
 | poetry / pipenv / pipx     | Latest from PyPI via `pip`                                        |
 | Claude Code (`claude`)     | Anthropic's official installer at `https://claude.ai/install.sh`  |
 | Antigravity CLI (`agy`)    | Google's official installer at `https://antigravity.google/cli/install.sh` |
