@@ -20,14 +20,14 @@ This image is based on Ubuntu (latest LTS)
 
 | Language Ecosystem | Version | Included Tools       |
 | ------------------ | ------- | -------------------- |
-| Node               | 22.16.0 | nvm, npm             |
+| Node               | 24.16.0 | nvm, npm             |
 | Python             | 3.12.3 | poetry, pipenv, pipx |
-| Java               | 21.0.7 |                      |
-| Dotnet             | 8.0.117 |                      |
-| GO                 | 1.24.4 |                      |
+| Java               | 25.0.2 |                      |
+| Dotnet             | 10.0.107 |                      |
+| GO                 | 1.26.3 |                      |
 | Ruby               | 3.2.3 | rbenv, gem           |
-| Rust               | 1.87.0 |                      |
-| Docker             | 28.2.2 |                      |
+| Rust               | 1.95.0 |                      |
+| Docker             | 29.5.2 |                      |
 
 # Build Instructions
 

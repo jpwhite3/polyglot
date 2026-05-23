@@ -2,12 +2,11 @@
 FROM ubuntu:24.04 AS base
 
 
-SHELL ["/bin/bash", "-c"]
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV TZ='America/New_York' \
 	DEBIAN_FRONTEND="noninteractive" \
-	PATH="/root/.cargo/bin:/root/.nvm/versions/node/v22.16.0/bin:/usr/local/go/bin:${PATH}" \
 	NVM_DIR="/root/.nvm" \
-	NODE_VERSION="lts/jod"
+	PATH="/root/.cargo/bin:/root/.nvm/current/bin:/usr/local/go/bin:${PATH}"
 
 # Install common packages in a single layer with proper cleanup
 RUN apt-get update && \
@@ -42,16 +41,22 @@ RUN apt-get update && \
 # Stage 2: Language-specific installations
 FROM base AS languages
 
-# Add repositories and install programming languages in a single layer
+# Add repositories and install programming languages in a single layer.
+# Versions are resolved dynamically so each build pulls the latest available
+# from the distro repos.
 RUN apt-get update && \
-	# Python
+	# Python (latest available in distro)
 	apt-get install -y --no-install-recommends python3 python3-dev python3-venv python3-pip && \
 	ln -s /usr/bin/python3 /usr/bin/python && \
-	# Java
-	apt-get install -y --no-install-recommends openjdk-25-jdk && \
-	# .NET
-	apt-get install -y --no-install-recommends dotnet-sdk-8.0 dotnet-runtime-8.0 && \
-	# Ruby
+	# Java: discover the highest openjdk-N-jdk package available
+	JDK_PKG=$(apt-cache pkgnames openjdk- | grep -E '^openjdk-[0-9]+-jdk$' | sort -V | tail -1) && \
+	echo "Installing Java: $JDK_PKG" && \
+	apt-get install -y --no-install-recommends "$JDK_PKG" && \
+	# .NET: discover the highest dotnet-sdk-X.Y available and install matching runtime
+	DOTNET_VER=$(apt-cache pkgnames dotnet-sdk- | grep -E '^dotnet-sdk-[0-9]+\.[0-9]+$' | sed 's/^dotnet-sdk-//' | sort -V | tail -1) && \
+	echo "Installing .NET: $DOTNET_VER" && \
+	apt-get install -y --no-install-recommends "dotnet-sdk-$DOTNET_VER" "dotnet-runtime-$DOTNET_VER" && \
+	# Ruby (latest available in distro)
 	apt-get install -y --no-install-recommends ruby-full rbenv && \
 	# Clean up
 	apt-get clean && \
@@ -60,20 +65,31 @@ RUN apt-get update && \
 # Stage 3: Tool installations (Go, Node, Rust, Docker)
 FROM languages AS tools
 
-# Install Go
-RUN curl -OL https://go.dev/dl/go1.25.6.linux-amd64.tar.gz && \
-	tar -C /usr/local -xf go1.25.6.linux-amd64.tar.gz && \
-	rm go1.25.6.linux-amd64.tar.gz && \
+# Install Go (auto-detect the latest stable version from go.dev)
+RUN GO_VERSION=$(curl -fsSL https://go.dev/VERSION?m=text | head -n1 | sed 's/^go//') && \
+	GO_TARBALL="go${GO_VERSION}.linux-amd64.tar.gz" && \
+	echo "Installing Go: ${GO_VERSION}" && \
+	curl -OL "https://go.dev/dl/${GO_TARBALL}" && \
+	tar -C /usr/local -xf "${GO_TARBALL}" && \
+	rm "${GO_TARBALL}" && \
 	ln -sf /usr/local/go/bin/go /usr/bin/go
 
-# Install Node.js with nvm
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash && \
+# Install Node.js with nvm.
+# - Uses the latest nvm release tag from GitHub
+# - Installs the current LTS line of Node
+# - Creates a stable $NVM_DIR/current symlink so the ENV PATH stays valid
+#   across version changes
+RUN NVM_VERSION=$(curl -fsSL https://api.github.com/repos/nvm-sh/nvm/releases/latest | jq -r '.tag_name') && \
+	echo "Installing nvm: ${NVM_VERSION}" && \
+	curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash && \
 	. $NVM_DIR/nvm.sh && \
-	nvm install $NODE_VERSION && \
-	nvm alias default $NODE_VERSION && \
+	nvm install --lts && \
+	nvm alias default 'lts/*' && \
 	nvm use default && \
-	ln -sf $(. $NVM_DIR/nvm.sh && which node) /usr/bin/node && \
-	ln -sf $(. $NVM_DIR/nvm.sh && which npm) /usr/bin/npm
+	NODE_VER=$(nvm version default) && \
+	ln -sfn "$NVM_DIR/versions/node/$NODE_VER" "$NVM_DIR/current" && \
+	ln -sf "$NVM_DIR/current/bin/node" /usr/bin/node && \
+	ln -sf "$NVM_DIR/current/bin/npm" /usr/bin/npm
 
 # Install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
