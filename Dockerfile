@@ -102,8 +102,26 @@ FROM tools AS python-config
 
 RUN python -m pip install --no-cache-dir pipx poetry pipenv --break-system-packages
 
-# Stage 5: Final image with configurations
-FROM python-config AS final
+# Stage 5: Agentic AI coding tools.
+# Each installer is the upstream "latest" curl|bash script, so the image always
+# picks up the newest release on rebuild. The tools typically drop binaries
+# under /root/<tool>/... and append PATH exports to /root/.bashrc; we mirror the
+# common install dirs into ENV PATH so the binaries are usable from any shell.
+FROM python-config AS ai-tools
+
+ENV PATH="/root/.local/bin:/root/.opencode/bin:${PATH}"
+
+# Install Claude Code (Anthropic)
+RUN curl -fsSL https://claude.ai/install.sh | bash
+
+# Install Antigravity CLI (Google)
+RUN curl -fsSL https://antigravity.google/cli/install.sh | bash
+
+# Install Opencode
+RUN curl -fsSL https://opencode.ai/install | bash
+
+# Stage 6: Final image with configurations
+FROM ai-tools AS final
 
 # Git Configuration
 RUN git config --global pull.rebase true && \
@@ -136,7 +154,11 @@ RUN echo "Tool versions:" && \
 	ruby --version && \
 	gem --version && \
 	rbenv --version && \
-	docker --version
+	docker --version && \
+	echo "Agentic AI tools:" && \
+	command -v claude && \
+	command -v opencode && \
+	command -v agy
 
 # Set default shell to zsh
 CMD ["zsh"]
